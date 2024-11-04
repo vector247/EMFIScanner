@@ -49,7 +49,7 @@ def handle_pulse():
 def main():
     listener = keyboard.Listener(on_press=on_press)
     listener.start()
-    while local_end != True:
+    while local_end != True:  # TODO: Find good way to end the script peacefully
         pass
 
 
