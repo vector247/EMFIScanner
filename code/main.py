@@ -55,7 +55,7 @@ def print_menu():
 
 def on_press(key):
     """
-    Handles keyboard inputsssswwddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddaaaaassr
+    Handles keyboard input
     """
     if key == keyboard.KeyCode(char="w"):
         pos_controller.move_rel(y=1)

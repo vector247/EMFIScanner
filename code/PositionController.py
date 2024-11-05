@@ -53,18 +53,20 @@ class PositionController:
 
         result_list = []
 
-        for z_iter in range(height + 1):
-            for y_iter in range(width + 1):
-                for x_iter in range(width + 1):
+        for z_iter in range((height * 4) + 1):
+            for y_iter in range((width * 4) + 1):
+                for x_iter in range((width * 4) + 1):
                     self.move_to(
-                        x=x_start + x_iter, y=y_start + y_iter, z=z_start + z_iter
+                        x=x_start + (x_iter / 4),
+                        y=y_start + (y_iter / 4),
+                        z=z_start + (z_iter / 4),
                     )
                     action_callback()
                     result_list.append(
                         {
-                            "x": x_start + x_iter,
-                            "y": y_start + y_iter,
-                            "z": z_start + z_iter,
+                            "x": x_start + (x_iter / 4),
+                            "y": y_start + (y_iter / 4),
+                            "z": z_start + (z_iter / 4),
                             "result": "r",
                         }
                     )
@@ -76,8 +78,17 @@ class PositionController:
 def main():
     newController = PositionController("COM25")
     newController.move_to(50, 50, 10)
+    time.sleep(3)
     newController.move_to(0, 10, 10)
+    time.sleep(3)
     newController.move_to(0, 0, 0)
+    time.sleep(1)
+    newController.move_to(0.25, 0, 0)
+    time.sleep(1)
+    newController.move_to(0.25, 0.25, 0)
+    time.sleep(1)
+    newController.move_to(0, 0, 0)
+    newController.close_controller()
 
 
 if __name__ == "__main__":
