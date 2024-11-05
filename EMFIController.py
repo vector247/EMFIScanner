@@ -17,7 +17,7 @@ class EMFIController:
         self.controller_interface.output(f"{self.current_duration}")  # Set duration
         self.controller_interface.output(f"{self.current_power}")  # Set power
 
-    def closeController(self):
+    def close_controller(self):
         self.controller_interface.output("d")  # Disarm
         time.sleep(3)
         self.is_armed = False
