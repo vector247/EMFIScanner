@@ -46,7 +46,7 @@ class PositionController:
         self.controller_interface.output(f"G01 X{self.x} Y{self.y} Z{self.z}")
         # time.sleep(1)
 
-    def move_raster(self, width, height, action_callback):
+    def move_raster(self, width, height, action_callback, eval_callback):
         x_start = self.x
         y_start = self.y
         z_start = self.z
@@ -67,7 +67,7 @@ class PositionController:
                             "x": x_start + (x_iter / 4),
                             "y": y_start + (y_iter / 4),
                             "z": z_start + (z_iter / 4),
-                            "result": "r",
+                            "result": eval_callback(),
                         }
                     )
                     time.sleep(1)
