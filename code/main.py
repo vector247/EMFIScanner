@@ -3,12 +3,17 @@ import time
 
 import PositionController
 import EMFIController
+import TargetController
 import Plot
 
 # Configuration Parameter
 POSITION_CONTROLLER_PORT = "COM25"  # Serial port connected to position controller
-EMFI_PROBE_PORT = "COM23"  # Serial port connected to EMFI Probe
-EMFI_PROBE_BAUD = 115200  # Baudrate of EMFI Probe
+EMFI_PROBE_PORT = "COM23"  # Serial port connected to EMFI probe
+EMFI_PROBE_BAUD = 115200  # Baudrate of EMFI probe
+TARGET_PROBE_PORT = "COM24"  # Serial port connected to target
+TARGET_PROBE_BAUD = 115200  # Baudrate of target
+TARGET_CHIP_WIDTH = 2
+TARGET_SCAN_HEIGHT = 0
 
 
 class MainLoop:
@@ -28,6 +33,9 @@ class MainLoop:
 main_loop = MainLoop()
 pos_controller = PositionController.PositionController(POSITION_CONTROLLER_PORT)
 emfi_controller = EMFIController.EMFIController(EMFI_PROBE_PORT, EMFI_PROBE_BAUD)
+target_controller = TargetController.TargetController(
+    TARGET_PROBE_PORT, TARGET_PROBE_BAUD
+)
 
 
 # Functions
@@ -69,10 +77,15 @@ def on_press(key):
         pos_controller.move_rel(z=1)
     if key == keyboard.KeyCode(char="l"):
         pos_controller.move_rel(z=-1)
+    if key == keyboard.KeyCode(char="b"):
+        target_controller.read(10, 5)
     if key == keyboard.KeyCode(char="r"):
         emfi_controller.arm()
         results = pos_controller.move_raster(
-            width=2, height=1, action_callback=handle_pulse
+            width=TARGET_CHIP_WIDTH,
+            height=TARGET_SCAN_HEIGHT,
+            action_callback=handle_pulse,
+            eval_callback=handle_target,
         )
         emfi_controller.disarm()
         Plot.plot_results(results)
@@ -85,6 +98,7 @@ def on_press(key):
     if key == keyboard.KeyCode(char="q"):
         pos_controller.close_controller()
         emfi_controller.close_controller()
+        target_controller.close_controller()
         main_loop.end_loop()
 
 
@@ -95,6 +109,23 @@ def handle_pulse():
     time.sleep(1)
     emfi_controller.pulse()
     # time.sleep(2)
+
+
+def handle_target():
+    # if target_controller.check_open() == False:
+    #    target_controller.reestablish_connection(TARGET_PROBE_PORT, TARGET_PROBE_BAUD)
+    #    return "b"
+    data = target_controller.read(16).decode()
+    print(data)  # TODO: Debug
+    if len(data) < 16:
+        return "y"
+    values = data.split("\r\n", 3)
+    print(values)  # TODO: Debug
+    if (int(values[0]) + 1 == int(values[1])) and (
+        int(values[1]) + 1 == int(values[2])
+    ):
+        return "g"
+    return "r"
 
 
 def main():

@@ -5,7 +5,7 @@ import SerialInterface
 
 class EMFIController:
     current_duration = 5
-    current_power = 0.01
+    current_power = 0.005
     is_armed = True  # Assume worst case
 
     def __init__(self, interface, baudrate):
