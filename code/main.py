@@ -84,6 +84,7 @@ def on_press(key):
     if key == keyboard.KeyCode(char="b"):
         target_controller.read(10, 5)
     if key == keyboard.KeyCode(char="r"):
+        start_time = time.time()
         emfi_controller.arm()
         results = pos_controller.move_raster(
             width=TARGET_CHIP_WIDTH,
@@ -94,6 +95,7 @@ def on_press(key):
         )
         emfi_controller.disarm()
         Plot.plot_results(results)
+        print(f"Scan required {time.time() - start_time} seconds")
     if key == keyboard.KeyCode(char="h"):
         pos_controller.home_xy()
     if key == keyboard.KeyCode(char="p"):
@@ -119,12 +121,12 @@ def handle_pulse():
 
 def handle_target():
     data = target_controller.read(24).decode()
-    print(data)  # TODO: Debug
+    # print(data)
     if len(data) < 24:
         target_controller.reset_target()
         return "y"
     values = data.split("\r\n", 3)
-    # print(values)  # TODO: Debug
+    # print(values)
     if (int(values[0]) + 1 == int(values[1])) and (
         int(values[1]) + 1 == int(values[2])
     ):
