@@ -17,7 +17,16 @@ class SerialInterface:
         output_string += "\n\r"
         self.port.write(output_string.encode())
 
+    def reset_input_buffer(self):
+        self.port.reset_input_buffer()
+
     def input(self, n_bytes):
+        data = b""
+        data = self.port.read(n_bytes)
+        print(f"Read {data} from {self.port.name}")
+        return data
+
+    def input_post_reset(self, n_bytes):
         data = b""
         self.port.reset_input_buffer()
         data = self.port.read(n_bytes)
