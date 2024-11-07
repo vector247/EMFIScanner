@@ -46,11 +46,12 @@ class PositionController:
         self.controller_interface.output(f"G01 X{self.x} Y{self.y} Z{self.z}")
         # time.sleep(1)
 
-    def move_raster(self, width, height, action_callback, eval_callback):
+    def move_raster(self, width, height, action_callback, eval_callback, n_rep=1):
         x_start = self.x
         y_start = self.y
         z_start = self.z
 
+        eval_result = []
         result_list = []
 
         for z_iter in range((height * 4) + 1):
@@ -61,13 +62,22 @@ class PositionController:
                         y=y_start + (y_iter / 4),
                         z=z_start + (z_iter / 4),
                     )
-                    action_callback()
+                    for n in range(n_rep):
+                        action_callback()
+                        eval_result.append(eval_callback())
+                    if "g" in eval_result:
+                        result = "g"
+                    if "y" in eval_result:
+                        result = "y"
+                    if "r" in eval_result:
+                        result = "r"
+                    eval_result = []
                     result_list.append(
                         {
                             "x": x_start + (x_iter / 4),
                             "y": y_start + (y_iter / 4),
                             "z": z_start + (z_iter / 4),
-                            "result": eval_callback(),
+                            "result": result,
                         }
                     )
                     time.sleep(1)
