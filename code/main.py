@@ -49,11 +49,11 @@ def print_menu():
     print("            |_____|            | by Vector247 |                          ")
     print("              | |              +--------------+                          ")
     print("               O                                                         ")
-    print("         ___________          Move XY         Move Z                     ")
-    print("        /          /          ____             ____                      ")
-    print("       /  ____    /          /_w_/            /_o_/                      ")
-    print("      /  /   /|  /     ____ ____ ____        ____                        ")
-    print("     /  r___/   /     /_a_//_s_//_d_/       /_l_/                        ")
+    print("         ___________          Move XY         (Micro)Move Z              ")
+    print("        /          /          ____            ____  ____                 ")
+    print("       /  ____    /          /_w_/           /_i_/ /_o_/                 ")
+    print("      /  /   /|  /     ____ ____ ____      ____  ____                    ")
+    print("     /  r___/   /     /_a_//_s_//_d_/     /_k_/ /_l_/                    ")
     print("^   /   |   |  / ^                                                       ")
     print("|  /          / /        Quit   Home XY    Start Scan    Manual Pulse    ")
     print("Z 0__________/ Y        ____     ____        ____            ____        ")
@@ -77,6 +77,10 @@ def on_press(key):
         pos_controller.move_rel(z=1)
     if key == keyboard.KeyCode(char="l"):
         pos_controller.move_rel(z=-1)
+    if key == keyboard.KeyCode(char="i"):
+        pos_controller.move_rel(z=0.25)
+    if key == keyboard.KeyCode(char="k"):
+        pos_controller.move_rel(z=-0.25)
     if key == keyboard.KeyCode(char="b"):
         target_controller.read(10, 5)
     if key == keyboard.KeyCode(char="r"):
@@ -86,6 +90,7 @@ def on_press(key):
             height=TARGET_SCAN_HEIGHT,
             action_callback=handle_pulse,
             eval_callback=handle_target,
+            n_rep=4,
         )
         emfi_controller.disarm()
         Plot.plot_results(results)
@@ -107,20 +112,19 @@ def handle_pulse():
     Callback function handling the pulse generation
     """
     time.sleep(1)
+    target_controller.reset_read_buffer()
     emfi_controller.pulse()
     # time.sleep(2)
 
 
 def handle_target():
-    # if target_controller.check_open() == False:
-    #    target_controller.reestablish_connection(TARGET_PROBE_PORT, TARGET_PROBE_BAUD)
-    #    return "b"
-    data = target_controller.read(16).decode()
+    data = target_controller.read(24).decode()
     print(data)  # TODO: Debug
-    if len(data) < 16:
+    if len(data) < 24:
+        target_controller.reset_target()
         return "y"
     values = data.split("\r\n", 3)
-    print(values)  # TODO: Debug
+    # print(values)  # TODO: Debug
     if (int(values[0]) + 1 == int(values[1])) and (
         int(values[1]) + 1 == int(values[2])
     ):
