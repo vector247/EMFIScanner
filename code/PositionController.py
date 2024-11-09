@@ -2,6 +2,10 @@ import time
 
 import SerialInterface
 
+STEPS_PER_MM_X = 4
+STEPS_PER_MM_Y = 4
+STEPS_PER_MM_Z = 4
+
 
 class PositionController:
     x = 0
@@ -46,21 +50,31 @@ class PositionController:
         self.controller_interface.output(f"G01 X{self.x} Y{self.y} Z{self.z}")
         # time.sleep(1)
 
-    def move_raster(self, width, height, action_callback, eval_callback, n_rep=1):
+    def move_raster(
+        self, width, height, action_callback, eval_callback, status_callback, n_rep=1
+    ):
         x_start = self.x
         y_start = self.y
         z_start = self.z
 
         eval_result = []
         result_list = []
+        task_counter = 0
 
-        for z_iter in range((height * 4) + 1):
-            for y_iter in range((width * 4) + 1):
-                for x_iter in range((width * 4) + 1):
+        for z_iter in range((height * STEPS_PER_MM_Z) + 1):
+            for y_iter in range((width * STEPS_PER_MM_Y) + 1):
+                for x_iter in range((width * STEPS_PER_MM_X) + 1):
+                    status_callback(
+                        task_counter,
+                        ((height * STEPS_PER_MM_Z) + 1)
+                        * ((width * STEPS_PER_MM_Y) + 1)
+                        * ((width * STEPS_PER_MM_X) + 1)
+                        * n_rep,
+                    )
                     self.move_to(
-                        x=x_start + (x_iter / 4),
-                        y=y_start + (y_iter / 4),
-                        z=z_start + (z_iter / 4),
+                        x=x_start + (x_iter / STEPS_PER_MM_X),
+                        y=y_start + (y_iter / STEPS_PER_MM_Y),
+                        z=z_start + (z_iter / STEPS_PER_MM_Z),
                     )
                     for n in range(n_rep):
                         action_callback()
@@ -74,12 +88,13 @@ class PositionController:
                     eval_result = []
                     result_list.append(
                         {
-                            "x": x_start + (x_iter / 4),
-                            "y": y_start + (y_iter / 4),
-                            "z": z_start + (z_iter / 4),
+                            "x": x_start + (x_iter / STEPS_PER_MM_X),
+                            "y": y_start + (y_iter / STEPS_PER_MM_Y),
+                            "z": z_start + (z_iter / STEPS_PER_MM_Z),
                             "result": result,
                         }
                     )
+                    task_counter += n_rep
                     time.sleep(1)
         self.move_to(x=x_start, y=y_start, z=z_start)
         return result_list
