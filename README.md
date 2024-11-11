@@ -1,6 +1,8 @@
 # EMFIScanner
 Tool to operate a EMFI Probe with a 3D printer based positioning system and DUT evaluation
 
+![EMFI Scanner](./img/picture.jpg "EMFI Scanner")
+
 ## Hardware setup
 
 This considers a standard setup with a 3D printer accepting GCode over UART as positioning device, FaultyCat as EMFI probe, a Raspberry Pi Pico with firmware form the target folder, and a NewAE Technology PhyWhisperer for power reset of the Pico.
