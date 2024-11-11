@@ -61,16 +61,19 @@ class PositionController:
         result_list = []
         task_counter = 0
 
+        status_callback(
+            task_counter,
+            ((height * STEPS_PER_MM_Z) + 1)
+            * ((width * STEPS_PER_MM_Y) + 1)
+            * ((width * STEPS_PER_MM_X) + 1)
+            * n_rep,
+            "",
+        )
+
         for z_iter in range((height * STEPS_PER_MM_Z) + 1):
             for y_iter in range((width * STEPS_PER_MM_Y) + 1):
                 for x_iter in range((width * STEPS_PER_MM_X) + 1):
-                    status_callback(
-                        task_counter,
-                        ((height * STEPS_PER_MM_Z) + 1)
-                        * ((width * STEPS_PER_MM_Y) + 1)
-                        * ((width * STEPS_PER_MM_X) + 1)
-                        * n_rep,
-                    )
+
                     self.move_to(
                         x=x_start + (x_iter / STEPS_PER_MM_X),
                         y=y_start + (y_iter / STEPS_PER_MM_Y),
@@ -95,6 +98,14 @@ class PositionController:
                         }
                     )
                     task_counter += n_rep
+                    status_callback(
+                        task_counter,
+                        ((height * STEPS_PER_MM_Z) + 1)
+                        * ((width * STEPS_PER_MM_Y) + 1)
+                        * ((width * STEPS_PER_MM_X) + 1)
+                        * n_rep,
+                        result,
+                    )
                     time.sleep(1)
         self.move_to(x=x_start, y=y_start, z=z_start)
         return result_list
