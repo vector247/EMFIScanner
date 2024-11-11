@@ -11,12 +11,12 @@ import TUI
 POSITION_CONTROLLER_PORT = "COM25"  # Serial port connected to position controller
 EMFI_PROBE_PORT = "COM23"  # Serial port connected to EMFI probe
 EMFI_PROBE_BAUD = 115200  # Baudrate of EMFI probe
-EMFI_PULSE_DURATION = 5
-EMFI_PULSE_POWER = 0.005
+EMFI_PULSE_DURATION = 5  # EMFI probe pulse duration
+EMFI_PULSE_POWER = 0.005  # EMFFI probe pulse power
 TARGET_PROBE_PORT = "COM24"  # Serial port connected to target
 TARGET_PROBE_BAUD = 115200  # Baudrate of target
-TARGET_CHIP_WIDTH = 2
-TARGET_SCAN_HEIGHT = 0
+TARGET_CHIP_WIDTH = 7  # Target chip width in mm
+TARGET_SCAN_HEIGHT = 0  # Height range in mm, if different distances between chip and probe shall be tested
 
 
 # Global Variables
@@ -75,8 +75,15 @@ def on_press(key):
         )
         emfi_controller.disarm()
         Plot.plot_results(results)
+        elapsed_seconds = time.time() - start_time
         user_interface.print_status(
-            "Scan required " + time.time() - start_time + " seconds"
+            "Scan required "
+            + str(int(elapsed_seconds / 3600))
+            + " hours "
+            + str(int((elapsed_seconds / 60) % 60))
+            + " minutes and "
+            + str(int(elapsed_seconds % 60))
+            + " seconds"
         )
     if key == keyboard.KeyCode(char="h"):
         user_interface.print_debug("Busy...              ")
@@ -95,11 +102,13 @@ def on_press(key):
     user_interface.print_debug("Awaiting input")
 
 
-def handle_status(current_task, total_tasks):
+def handle_status(current_task, total_tasks, last_result):
     user_interface.print_status(
         "Progress: "
         + str(round(current_task / total_tasks * 100, 2))
-        + "% done                "
+        + "% done | Last result: "
+        + last_result
+        + "              "
     )
 
 
