@@ -87,7 +87,7 @@ def handle_target():
 Adjust EMFIController.py and `handle_pulse` in main.py
 
 #### 3D Printer
-Ajust PositionController.py
+Adjust PositionController.py
 
 #### Target 
 Adjust TargetController.py and `handle_target` in main.py
